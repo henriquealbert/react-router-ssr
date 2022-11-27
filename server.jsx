@@ -20,10 +20,12 @@ const helmetTags = [
   'noscript',
 ];
 
-let createStylesServer, ServerStyles;
+let stylesServer, ServerStyles, createStylesServer;
 
 try {
   ({ createStylesServer, ServerStyles } = require('@mantine/ssr'));
+
+  stylesServer = createStylesServer();
 } catch (e) { }
 
 /* eslint-enable */
@@ -43,8 +45,7 @@ export const renderWithSSR = (component, { renderTarget = 'react-target' } = {})
     const AppJSX = <ReactRouterSSR location={ sink.request.url } />;
     const renderedString = renderToString(AppJSX);
 
-    if (ServerStyles && createStylesServer) {
-      const stylesServer = createStylesServer();
+    if (ServerStyles && stylesServer) {
       sink.appendToHead(
         renderToStaticMarkup(
           <ServerStyles html={renderedString} server={stylesServer} />,
