@@ -2,7 +2,7 @@
 
 Package.describe({
   name: 'hschmaiske:react-router-ssr',
-  version: '1.0.2',
+  version: '1.0.3',
   summary: 'Re-implementation of Meteor-Community-Packages/react-router-ssr',
   git: 'https://github.com/henriquealbert/react-router-ssr.git',
   documentation: 'README.md',
