@@ -3,9 +3,9 @@ import { FastRender } from 'meteor/communitypackages:fast-render';
 
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { StaticRouter } from 'react-router';
+import { StaticRouter } from 'react-router-dom/server';
 import ReactDom from 'react-dom'; // eslint-disable-line no-unused-vars
-import { renderToString } from 'react-dom/server';
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 
 import { isAppUrl } from './helpers';
 import './version-check';
@@ -20,74 +20,37 @@ const helmetTags = [
   'noscript',
 ];
 
-let Provider;
-let applyMiddleware;
-let createStore;
-let ServerStyleSheet;
-
-/* eslint-disable */
-try {
-  ({ Provider } = require('react-redux'));
-  ({ createStore, applyMiddleware } = require('redux'));
-} catch (e) { }
+let createStylesServer, ServerStyles;
 
 try {
-  ({ ServerStyleSheet } = require('styled-components'));
+  ({ createStylesServer, ServerStyles } = require('@mantine/ssr'));
 } catch (e) { }
 
 /* eslint-enable */
 
-export const renderWithSSR = (component, { renderTarget = 'react-target', storeOptions } = {}) => {
+export const renderWithSSR = (component, { renderTarget = 'react-target' } = {}) => {
   FastRender.onPageLoad(sink => {
     if (!isAppUrl(sink.request)) {
       return;
     }
 
-    let ReactRouterSSR = ({ location }) => (
+    const ReactRouterSSR = ({ location }) => (
       <StaticRouter location={ location } context={ {} }>
         { component }
       </StaticRouter>
     );
 
-    if (storeOptions) {
-      const { rootReducer, initialState, middlewares } = storeOptions;
-      const appliedMiddlewares = middlewares
-        ? applyMiddleware(...middlewares)
-        : null;
-
-      const store = createStore(rootReducer, initialState, appliedMiddlewares);
-
-      ReactRouterSSR = ({ location }) => (
-        <Provider store={ store }>
-          <StaticRouter location={ location } context={ {} }>
-            { component }
-          </StaticRouter>
-        </Provider>
-      );
-
-      /* eslint-disable */
-      sink.appendToHead(`
-          <script>
-              window.__PRELOADED_STATE__ = ${JSON.stringify(
-        store.getState()
-      ).replace(/</g, '\\u003c')}
-          </script>
-      `);
-      /* eslint-enable */
-    }
-
-    let AppJSX;
-
-    if (ServerStyleSheet) {
-      const sheet = new ServerStyleSheet();
-      AppJSX = sheet.collectStyles(
-        <ReactRouterSSR location={ sink.request.url } />,
-      );
-    } else {
-      AppJSX = <ReactRouterSSR location={ sink.request.url } />;
-    }
-
+    const AppJSX = <ReactRouterSSR location={ sink.request.url } />;
     const renderedString = renderToString(AppJSX);
+
+    if (ServerStyles && createStylesServer) {
+      const stylesServer = createStylesServer();
+      sink.appendToHead(
+        renderToStaticMarkup(
+          <ServerStyles html={renderedString} server={stylesServer} />,
+        ),
+      );
+    }
 
     sink.renderIntoElementById(renderTarget, renderedString);
 
