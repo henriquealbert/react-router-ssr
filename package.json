@@ -1,9 +1,9 @@
 {
   "name": "meteor-react-router-ssr",
-  "version": "4.0.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./ && ./node_modules/.bin/markdownlint ./",
-    "publish-release": "rimraf ./node_modules && meteor publish && meteor npm i --only=dev",
+    "publish-release": "rm -rf ./node_modules && meteor publish && meteor npm i --only=dev",
     "pre-commit": "lint-staged",
     "prepare": "husky install"
   },
