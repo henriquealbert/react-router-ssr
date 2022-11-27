@@ -6,15 +6,14 @@ import { BrowserRouter } from 'react-router-dom';
 
 import './version-check';
 
-const renderWithSSR = (appComponent, { renderTarget = 'react-target' } = {}) => {
-  const ReactRouterSSR = ({ location }) => (
-        <BrowserRouter location={location}>
-            {appComponent}
-        </BrowserRouter>
-  );
+const renderWithSSR = (
+  appComponent,
+  { renderTarget = 'react-target' } = {},
+) => {
+  const ReactRouterSSR = () => <BrowserRouter>{appComponent}</BrowserRouter>;
 
-  FastRender.onPageLoad((sink) => {
-    ReactDOM.hydrate(<ReactRouterSSR location={sink.request.url} />, document.getElementById(renderTarget));
+  FastRender.onPageLoad(() => {
+    ReactDOM.hydrate(<ReactRouterSSR />, document.getElementById(renderTarget));
   });
 };
 
