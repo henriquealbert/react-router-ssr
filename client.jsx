@@ -6,44 +6,16 @@ import { BrowserRouter } from 'react-router-dom';
 
 import './version-check';
 
-let Provider;
-let applyMiddleware;
-let createStore;
-
-/* eslint-disable */
-try {
-    ({ Provider } = require('react-redux'));
-    ({ createStore, applyMiddleware } = require('redux'));
-} catch (e) {}
-
-const renderWithSSR = (component, { renderTarget = 'react-target', storeOptions } = {}) => {
-
-    let ReactRouterSSR = () => (
-        <BrowserRouter>
-            {component}
+const renderWithSSR = (appComponent, { renderTarget = 'react-target' } = {}) => {
+  const ReactRouterSSR = ({ location }) => (
+        <BrowserRouter location={location}>
+            {appComponent}
         </BrowserRouter>
-    );
+  );
 
-    if (storeOptions) {
-        const { rootReducer, middlewares } = storeOptions;
-        const appliedMiddlewares = middlewares ? applyMiddleware(...middlewares) : null;
-        const store = createStore(rootReducer, window.__PRELOADED_STATE__, appliedMiddlewares);
-
-        delete window.__PRELOADED_STATE__;
-
-        ReactRouterSSR = () => (
-            <Provider store={store}>
-                <BrowserRouter>
-                    {component}
-                </BrowserRouter>
-            </Provider>
-        );
-    }
-
-    FastRender.onPageLoad(() => {
-        ReactDOM.hydrate(<ReactRouterSSR />, document.getElementById(renderTarget));
-    });
+  FastRender.onPageLoad((sink) => {
+    ReactDOM.hydrate(<ReactRouterSSR location={sink.request.url} />, document.getElementById(renderTarget));
+  });
 };
-
 
 export { renderWithSSR };
