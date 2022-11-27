@@ -1,26 +1,6 @@
-# React-Router-SSR
+# React-Router-SSR v6 with Mantine SSR
 
 Simple isomorphic React SSR for Meteor with subscribed data re-hydration
-
-## Supporting the project ❤️
-
-This project, like all of the projects maintained by the Meteor Community Packages org, takes time and hard work to keep updated. If you find this or any of our other packages useful, consider visiting the sponsor section of a repo and sending some love to the dedicated developers that keep your favorite packages up to date.
-
-## Upgrades
-
-### Upgrading from v2 to v3
-
-To better align with the default app that is created by the `meteor create` command. This package by default now renders into an element with an id of `react-target` where it used to render to and id of `react-app`, but is also now configurable. If your are upgrading from v2, you will need to either change the id in your html file, or use the `renderTarget` configuration option to set the renderTarget id to `react-app`.
-
-```js
-  renderWithSSR(<App />, {
-    renderTarget: 'react-app',
-  });
-```
-
-### Upgrading from v3 to v4
-
-Update to `react-router-dom` to v6
 
 ## Install
 
@@ -30,15 +10,11 @@ Update to `react-router-dom` to v6
    npm install --save react react-dom react-router-dom react-helmet
    ```
 
-2. Install `communitypackages:react-router-ssr`
+2. Install `hschmaiske:react-router-ssr`
 
    ```sh
-   meteor add communitypackages:react-router-ssr
+   meteor add hschmaiske:react-router-ssr
    ```
-
-> For `react-router-dom` v5 use v3 `communitypackages:react-router-ssr`.
->
-> For `react-router-dom` v6 use v4 `communitypackages:react-router-ssr`.
 
 ## Package Exports 📦
 
@@ -50,29 +26,11 @@ Update to `react-router-dom` to v6
 
   - _`renderTarget`_ - A string specifying the `id` of the element to render your app into. Default is `react-target`
 
-  - _`storeOptions`_ - An object that contains the options for a redux store.
-
-    - `rootReducer` - Your apps root reducer.
-    - `initialState` - The initial state.
-    - `middlewares` - An array of middlewares to apply.
-
   ```js
-  import { renderWithSSR } from "meteor/communitypackages:react-router-ssr";
-
-  import thunk from "redux-thunk";
-  import { createLogger } from "redux-logger";
-
-  import rootReducer from "./reducers/root";
-
-  const logger = createLogger({ diff: true });
+  import { renderWithSSR } from "meteor/hschmaiske:react-router-ssr";
 
   renderWithSSR(<App />, {
-    renderTarget: 'react-app',
-    storeOptions: {
-      rootReducer,
-      initialState: { counter: 100 },
-      middlewares: [thunk, logger]
-    }
+    renderTarget: "react-app",
   });
   ```
 
@@ -94,7 +52,7 @@ By default this package renders your app into an HTML element with an id of `rea
 In shared code, such as in a `/both/main.jsx` file, or in a file that is imported into your `mainModule` for both the client and server..
 
 ```js
-import { renderWithSSR } from "meteor/communitypackages:react-router-ssr";
+import { renderWithSSR } from "meteor/hschmaiske:react-router-ssr";
 import { useTracker } from "meteor/react-meteor-data";
 
 import React from "react";
@@ -105,7 +63,7 @@ import LoginPage from "./imports/ui/pages/login";
 
 const App = () => {
   const { user } = useTracker(() => ({
-    user: Meteor.user()
+    user: Meteor.user(),
   }));
   if (user) {
     return (
@@ -122,6 +80,8 @@ const App = () => {
 renderWithSSR(<App />);
 ```
 
-## Styled Components 💅
+## Mantine
 
-If the [styled-components](https://styled-components.com/) package is installed in your project, this package will detect it is present, create a new `ServerStyleSheet`, collect all styles, and use them to render your app.
+If the [mantine](https://mantine.dev/) package is installed in your project, this package will detect it's presence, collect all styles, and use them to render your app.
+You need to make sure that you have all mantine packages installed:
+`@mantine/core @mantine/ssr @emotion/react @emotion/server`
